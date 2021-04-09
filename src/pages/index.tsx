@@ -30,11 +30,26 @@ interface HomeProps {
 }
 
 function Home({ postProducts }: HomeProps) {
+  const { data } = useQuery<WPGraphQL.GetPostsQuery>(featuredPostsQuery);
+  const posts = data?.posts?.nodes ?? [];
+
   return (
     <Layout>
       <h1>Home</h1>
+      {posts.map((post) => (
+        <h1>{post.title}</h1>
+      ))}
     </Layout>
   );
+}
+
+async function getStaticProps(ctx: GetStaticPropsContext) {
+  const client = getApolloClient(ctx);
+  const { data } = await client.query({
+    query: featuredPostsQuery,
+  });
+
+  const result = await getNextStaticProps(ctx);
 }
 
 export default Home;
